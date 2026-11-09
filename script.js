@@ -207,6 +207,9 @@ function changePlayerTurn() {
            document.getElementById("currentPlayer").textContent = player1 + " ist am Zug!";
 
        }
+       if (player2 === player1) {
+           document.getElementById("p2Input").value = player2 + "2";
+       }
    }
 
 
