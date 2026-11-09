@@ -191,11 +191,17 @@ function checkField(c, r) {
 function changePlayerTurn() {
 
    if (gameStarted) {
+
+       if (document.getElementById("p2Input").value === document.getElementById("p1Input").value) {
+           document.getElementById("p2Input").value = document.getElementById("p2Input").value + 2;
+           player2 =  document.getElementById("p2Input").value;
+       }
        if (playerTurn === 1) {
            playerTurn = 2;
 
            if (document.getElementById("p2Input").value !== "") {
                player2 = document.getElementById("p2Input").value;
+
            }
            document.getElementById("currentPlayer").textContent = player2 + " ist am Zug!";
 
@@ -207,9 +213,7 @@ function changePlayerTurn() {
            document.getElementById("currentPlayer").textContent = player1 + " ist am Zug!";
 
        }
-       if (player2 === player1) {
-           document.getElementById("p2Input").value = player2 + "2";
-       }
+
    }
 
 
