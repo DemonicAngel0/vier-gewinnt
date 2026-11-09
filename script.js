@@ -1,5 +1,6 @@
 
 let gameStarted = false;
+let locked = false;
 let rows = 6;
 let cols = 7;
 let defaultValue = 0;
@@ -7,260 +8,263 @@ let playerTurn = 0;
 
 let player1 = "Spieler 1";
 let player2 = "Spieler 2";
-let player1Color = "red"
-let player2Color = "yellow"
 
-let gameWon = false;
+const LOCK_MS = 300;
+const HINT = "Namen eingeben und „Start“ drücken.";
+const directions = [[1, 0], [0, 1], [1, 1], [1, -1]]; // richtungen fuer Gewinnbestimmung
 
-let playField = playFieldGenerator( rows, cols, defaultValue );
+let playField = playFieldGenerator(rows, cols, defaultValue);
 
 
 
-function playFieldGenerator( rows, cols, defaultValue){
 
-    let arr = [];
+// generieren des Spielfelds
+function playFieldGenerator(rows, cols, defaultValue) {
 
-    // Creates all lines:
-    for(let i=0; i < cols; i++){
+    const arr = [];
 
-        // Creates an empty line
-        arr.push([]);
+    for (let i = 0; i < cols; i++) {
 
-        // Adds cols to the empty line:
-        arr[i].push( new Array(rows));
-
-        for(let j=0; j < rows; j++){
-            // Initializes:
-            arr[i][j] = defaultValue;
-        }
+        arr.push(new Array(rows).fill(defaultValue)); // erstellen des Spielfeld-Arrays, mit 0 füllen
     }
-
-
     return arr;
 }
 
+// zuruecksetzen des Spielfelds
 function resetField() {
 
-    for (let i=0; i < cols; i++){
+    for (let i = 0; i < cols; i++) {
 
-        for (let j=0; j < rows; j++){
+        for (let j = 0; j < rows; j++) {
 
-            playField[i][j] = defaultValue;
-            document.getElementById("field-" + i + "-" + j).style.background = 'white';
+            playField[i][j] = defaultValue; // Spielfeld-Array mit 0 auffüllen
 
-
+            document.getElementById("field-" + i + "-" + j)
+                .classList.remove("player1", "player2", "winner"); // DOM-Tokens entfernen bei jedem zurücksetzen
         }
     }
 }
 
 
-// click event for start button
-function start() {
 
 
-    document.getElementById('start').style.display = "none";
-    document.getElementById('reset').style.display = "block";
-    gameStarted = true;
+// status-Label setzen
+function setStatus(text, turn) {
 
-    player1Color = document.getElementById("p1Color").value;
-    player2Color = document.getElementById("p2Color").value;
+    const status = document.getElementById("currentPlayer");
+    status.textContent = text;
+    status.className = turn ? "turn" + turn : "";
+}
 
-    playerTurn = Math.floor((Math.random()+0.5)*2); //random start
-    changePlayerTurn()
+// aktuellen Zug anzeigen
+function showTurn() {
+
+    const name = (playerTurn === 1) ? player1 : player2;
+    setStatus(name + " ist am Zug!", playerTurn);
+}
+
+// Eingaben an-/ausschalten
+function setInputsDisabled(disabled) {
+
+    for (const id of ["p1Input", "p2Input", "p1Color", "p2Color"]) {
+
+        document.getElementById(id).disabled = disabled;
+    }
+}
+
+// Spielfeld (de-)aktivieren
+function setBoardActive(active) {
+
+    document.querySelector("table").classList.toggle("inactive", !active);
+}
+
+// Spielende
+function endGame() {
+
+    gameStarted = false;
+    setBoardActive(false);
 }
 
 
+
+
+// Spielstart
+function start() {
+
+    // Spielernamen einlesen
+    const name1 = document.getElementById("p1Input").value.trim();
+    const name2 = document.getElementById("p2Input").value.trim();
+
+    // Spielerfarben einlesen
+    const color1 = document.getElementById("p1Color").value;
+    const color2 = document.getElementById("p2Color").value;
+
+
+    // Namens- und Farbvalidierung
+    if (name1 === "" || name2 === "") {
+
+        setStatus("Bitte beide Spielernamen eingeben.");
+        return;
+    }
+    if (name1.toLowerCase() === name2.toLowerCase()) {
+
+        setStatus("Die Spielernamen müssen sich unterscheiden.");
+        return;
+    }
+    if (color1 === color2) {
+        setStatus("Bitte zwei verschiedene Farben wählen.");
+        return;
+    }
+
+    // Spielernamen setzen
+    player1 = name1;
+    player2 = name2;
+
+    // Spielerfarben setzen
+    document.documentElement.style.setProperty("--p1-color", color1);
+    document.documentElement.style.setProperty("--p2-color", color2);
+
+
+    // Startknopf verstecken, Resetknopf zeigen
+    document.getElementById("start").hidden = true;
+    document.getElementById("reset").hidden = false;
+
+
+    setInputsDisabled(true);
+    setBoardActive(true);
+    gameStarted = true; // Spiel starten
+
+    playerTurn = Math.random() < 0.5 ? 1 : 2; // zufaelliger Spieler beginnt
+    showTurn();
+}
+
+// Zuruecksetzen
 function reset() {
 
     resetField();
 
-    document.getElementById('start').style.display = "block";
-    document.getElementById('reset').style.display = "none";
+    // Startknopf zeigen, Resetknopf verstecken
+    document.getElementById("start").hidden = false;
+    document.getElementById("reset").hidden = true;
 
-    document.getElementById("currentPlayer").textContent = "";
-    player1 = "Spieler 1";
-    player2 = "Spieler 2";
+
+    setInputsDisabled(false);
+    setBoardActive(false);
+    setStatus(HINT); // Hinweis anzeigen
 
     gameStarted = false;
-    gameWon = false;
-
-
 }
 
 
-function calcVertical(row, col, bottom,  cou) {
 
-    for (let v = row; v >= bottom; v--) {
 
-        if (playField[col][v] === playerTurn) cou[0]++
-        else if (cou[0] < 4) cou[0] = 0;
+
+function collectLine(c, r, dc, dr, player) {
+    // c: columns, r: rows, dc: Spaltenzaelrichtung, dr: Zeilenzaelrichtung, player: Spieler
+
+    const cells = []; // Koordinatenarray fuer Gewinnpruefung
+
+    let cc = c + dc;
+    let rr = r + dr;
+
+    while (cc >= 0 && cc < cols && rr >= 0 && rr < rows && playField[cc][rr] === player) {
+
+        cells.push([cc, rr]);
+        cc += dc;
+        rr += dr;
     }
-    return cou;
+    return cells;
 }
 
-function calcHorizontal(row,  leftBorder, rightBorder, cou) {
+// Gewinnpruefung
+function checkWin(c, r, player) {
 
-    for (let h = leftBorder; h < rightBorder; h++) {
+    let won = false;
 
-        if (playField[h][row] === playerTurn) cou[1]++
-        else if (cou[1] < 4) cou[1] = 0;
-    }
-    return cou;
-}
+    for (const [dc, dr] of directions) {
+        // Richtungen durchgehen
 
-function calcDiagonal(row, col, rightBorder, top, cou) {
+        const line = [[c, r],
+            ...collectLine(c, r, dc, dr, player),
+            ...collectLine(c, r, -dc, -dr, player)]; // mit "-" um auch Gegenrichtung zu pruefen
 
-    for (let lc = 0; lc < cols; lc++) {
+        if (line.length >= 4) {
 
-        if (( row + 3 - lc ) < rows && ( row + 3 - lc ) >=0 && ( col - 3 + lc ) <= rightBorder && ( col - 3 + lc ) >= 0) {
-
-            if (playField[ col - 3 + lc ][ row + 3 - lc ] === playerTurn) cou[2]++;
-            else if (cou[2] < 4) cou[2] = 0;
-        }
-        if (( row - 3 + lc ) <= top && ( row - 3 + lc ) >=0 && ( col - 3 + lc ) <= rightBorder && ( col - 3 + lc ) >= 0) {
-
-            if (playField[col - 3 + lc][row - 3 + lc] === playerTurn) cou[3]++;
-            else if (cou[3] < 4) cou[3] = 0;
-        }
-    }
-    return cou;
-}
-
-
-
-
-function checkField(c, r) {
-
-    let up, down, left, right;
-
-    let counts= [0,0,0,0] // vertikal, horizontal, diagonal lo->ru , lu->ro
-
-
-    if (c < 3) left = 0;
-    else left = c - 3;
-
-    if (c > 3) right = cols-1;
-    else right = c + 3;
-
-    if (r < 3) down = 0;
-    else down = r - 3;
-
-    if (r > 2) up = rows-1;
-    else up = r + 3;
-
-    counts = calcVertical( r, c, down, counts );
-
-    counts = calcHorizontal( r, left, right+1, counts)
-
-    counts = calcDiagonal( r, c, right, up, counts);
-
-
-    for (let i = 0; i < 4; i++){
-
-        if (counts[i] >= 4) {
-
-            if (playerTurn === 1) document.getElementById("currentPlayer").textContent = player1 + " hat gewonnen!";
-            else document.getElementById("currentPlayer").textContent = player2 + " hat gewonnen!";
-            gameWon = true;
-            gameStarted = false
-            break;
-        }
-    }
-
-
-    if (gameWon !== true){
-
-        let finalRow = 0;
-
-        for (let f = 0; f < cols; f++){
-
-            if (playField[f][rows-1] !== 0) finalRow++;
-        }
-
-        if (finalRow === cols) {
-
-            document.getElementById("currentPlayer").textContent = "Unentschieden!";
-
-            gameStarted = false
-        }
-    }
-
-}
-
-
-function changePlayerTurn() {
-
-   if (gameStarted) {
-
-       if (document.getElementById("p2Input").value === document.getElementById("p1Input").value) {
-           document.getElementById("p2Input").value = document.getElementById("p2Input").value + 2;
-           player2 =  document.getElementById("p2Input").value;
-       }
-       if (playerTurn === 1) {
-           playerTurn = 2;
-
-           if (document.getElementById("p2Input").value !== "") {
-               player2 = document.getElementById("p2Input").value;
-
-           }
-           document.getElementById("currentPlayer").textContent = player2 + " ist am Zug!";
-
-       } else {
-           playerTurn = 1;
-           if (document.getElementById("p1Input").value !== "") {
-               player1 = document.getElementById("p1Input").value;
-           }
-           document.getElementById("currentPlayer").textContent = player1 + " ist am Zug!";
-
-       }
-
-   }
-
-
-}
-
-function playerColor() {
-
-    if (playerTurn === 1) return player1Color
-    else return player2Color
-}
-
-function drop(column) {
-
-    if (gameStarted) {
-
-        for (let j = 0; j < rows; j++) {
-
-            if (playField[column][j] === 0) {
-
-                playField[column][j] = playerTurn;
-                document.getElementById("field-" + column + "-" + j).style.background = playerColor();
-                checkField(column, j);
-                changePlayerTurn();
-                break;
+            won = true;
+            for (const [lc, lr] of line) {
+                // Gewinnsteine markieren
+                document.getElementById("field-" + lc + "-" + lr).classList.add("winner");
             }
         }
+    }
+    return won;
+}
 
+// Spielfeld ueberpruefen
+function checkField(c, r) {
 
+    if (checkWin(c, r, playerTurn)) {
+
+        const winner = (playerTurn === 1) ? player1 : player2;
+        setStatus(winner + " hat gewonnen!", playerTurn);
+        endGame();
+
+    } else if (playField.every(column => column[rows - 1] !== 0)) {
+
+        setStatus("Unentschieden!");
+        endGame();
     }
 }
 
 
 
 
+// Spielerwechsel
+function changePlayerTurn() {
 
-//register click handler for start button
-document.addEventListener('DOMContentLoaded', function() {
+    if (!gameStarted) return;
 
-    document.getElementById("start").addEventListener("click", start, false);
-    document.getElementById("reset").addEventListener("click", reset, false);
+    playerTurn = (playerTurn === 1) ? 2 : 1;
+    showTurn();
+}
 
+// Spielstein "einwerfen" bzw. fallen lassen
+function drop(column) {
+
+    if (!gameStarted || locked) return; // verlaesst, wenn Spiel nicht gestartet oder Stein setzen blockiert ist
+
+    for (let j = 0; j < rows; j++) {
+
+        if (playField[column][j] === 0) {
+
+            locked = true;
+            setTimeout(() => { locked = false; }, LOCK_MS);
+            // klicktimeout zur Vermeidung von 2 gesetzten Steinen bei Doppelklicks
+
+            playField[column][j] = playerTurn; // Spieler-Nummer in Spielfeld-Array eintragen
+            document.getElementById("field-" + column + "-" + j)
+                .classList.add("player" + playerTurn); // farbig markieren
+
+            checkField(column, j);
+            changePlayerTurn();
+            return;
+        }
+    }
+}
+
+
+
+// Eventlistener
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("start").addEventListener("click", start);
+    document.getElementById("reset").addEventListener("click", reset);
+
+    // in jede Spalte klickbar
     document.querySelector("table").addEventListener("click", (event) => {
-        const cell = event.target.closest("td");
+        const cell = event.target.closest("td, th");
         if (cell === null) return;
         drop(Number(cell.dataset.col));
     });
 
-
-
+    setStatus(HINT);
 });

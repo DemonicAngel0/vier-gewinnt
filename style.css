@@ -2,12 +2,35 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-   
+
 }
+
+
 
 :root {
     --cell: min(50px, 11vw);
+    --p1-color: #ff0000;
+    --p2-color: #ffff00;
 }
+
+
+
+#heLogo {
+    display: block;
+    width: 100px;
+    max-width: 100%;
+    height: auto;
+}
+
+
+
+header {
+    text-align: left;
+    margin-right: auto;
+    padding: 1rem 1.5rem 0;
+}
+
+
 
 body {
 
@@ -23,24 +46,27 @@ body {
 }
 
 
-header {
-    text-align: left;
-    margin-right: auto;
-    padding-top: 1rem;
-}
-
-
-
 
 h1 {
     text-align: center;
     margin: 0 0 20px 0;
 }
 
-h2 {
+
+
+#currentPlayer {
+    width: fit-content;
+    margin: 0 auto 20px;
+    padding-bottom: 4px;
+    border-bottom: 6px solid transparent;
+    font-size: 1.5em;
+    font-weight: bold;
     text-align: center;
-    margin-bottom: 20px;
 }
+
+#currentPlayer.turn1 { border-bottom-color: var(--p1-color); }
+#currentPlayer.turn2 { border-bottom-color: var(--p2-color); }
+
 
 
 #gameButtons {
@@ -48,30 +74,25 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    padding-top: 5%;
+    padding-top: 0;
     padding-left: 15%;
 
 
 }
 
 .buttonX {
-    min-height: 10px;
-    min-width: 60px;
+
     height: 40px;
     width: 240px;
     font-size: 20px;
 }
 
-#reset { display: none; }
 
-.pNumName {
-    font-size: 20px;
-}
+
+
 
 #p1Input, #p2Input {
 
-    min-height: 10px;
-    min-width: 60px;
     height: 40px;
     width: 240px;
     font-size: 20px;
@@ -79,13 +100,11 @@ h2 {
 
 #p1Color, #p2Color {
 
-    min-height: 10px;
-    min-width: 10px;
     height: 40px;
     width: 40px;
-    font-size: 20px;
 }
 
+.pNumName { font-size: 20px; }
 
 #playerNameInputs {
 
@@ -97,14 +116,31 @@ h2 {
     gap: 5px;
 }
 
+
+
 #playField {
 
     width: 100%;
-    height: 100%;
     display: flex;
     flex-wrap: wrap;
-
 }
+
+
+
+
+
+
+@media (hover: hover) {
+    table:not(.inactive) .drop:hover {
+        background: green;
+        cursor: pointer;
+    }
+}
+
+main {
+    width: 100%;
+}
+
 
 
 .white {
@@ -114,6 +150,15 @@ h2 {
     background: white;
 }
 
+.white.player1 { background: var(--p1-color); }
+.white.player2 { background: var(--p2-color); }
+
+.white.winner {
+    box-shadow: 0 0 0 4px #fff, 0 0 14px 6px rgba(255, 255, 255, 0.8);
+}
+
+
+
 .drop {
     border-radius: 50%;
     width: var(--cell);
@@ -122,22 +167,21 @@ h2 {
     border: 3px dotted dimgray;
 }
 
-@media (hover: hover) {
-    .drop:hover {
-        background: green;
-    }
-}
-
 table {
     display: grid;
-
-    max-height: 900px;
-    max-width: 370px;
-    min-width: 37px;
-    min-height: 90px;
+    width: calc(var(--cell) * 7 + 20px);
     background: #193058;
     margin: auto;
     padding: 10px;
+    user-select: none;
+}
+
+table.inactive .drop {
+    opacity: 0.4;
+}
+
+table, .buttonX {
+    touch-action: manipulation;
 }
 
 thead {
@@ -149,16 +193,7 @@ tr {
 padding: 10px;
 }
 
-#heLogo {
-    display: block;
-    width: 100px;
-    max-width: 100%;
-    height: auto;
-}
 
-table, .buttonX {
-    touch-action: manipulation;
-}
 
 @media (max-width: 1000px) {
 
@@ -193,9 +228,6 @@ table, .buttonX {
         width: 100%;
     }
 
-    .pInputRow {
-        width: 100%;
-    }
 
     #p1Input, #p2Input {
         width: auto;

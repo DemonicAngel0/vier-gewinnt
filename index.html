@@ -15,130 +15,125 @@
 
 
     <body>
-      <header>
-          <div><img src="logo_he.svg" id="heLogo" alt="HE-Logo"></div>
-          <div> Marc Schopf </div>
-          <div> SWB3 </div>
-          <div> mascit48 </div>
-      </header>
-
-
-      <h1>Vier-Gewinnt</h1>
-      <h2 id="currentPlayer"></h2>
+    <header>
+        <img src="logo_he.svg" id="heLogo" alt="Logo der Hochschule Esslingen">
+        <p>Marc Schopf</p>
+        <p>Studiengang: SWB3</p>
+        <p>Kürzel: mascit48</p>
+    </header>
 
 
 
-      <div id="playField">
-          <div id="gameButtons">
-              <div id="start">
-                  <button type="button"  class="buttonX">Start</button>
-              </div>
-              <div id="reset">
-                  <button type="button" class="buttonX">Zurücksetzen</button>
-              </div>
-          </div>
 
 
-        <table>
-          <thead>
-            <tr>
-              <td id="drop-0" class="field drop" data-col="0"></td>
-              <td id="drop-1" class="field drop" data-col="1"></td>
-              <td id="drop-2" class="field drop" data-col="2"></td>
-              <td id="drop-3" class="field drop" data-col="3"></td>
-              <td id="drop-4" class="field drop" data-col="4"></td>
-              <td id="drop-5" class="field drop" data-col="5"></td>
-              <td id="drop-6" class="field drop" data-col="6"></td>
-            </tr>
-          </thead>
-          <tbody id="pField">
+    <main>
+        <h1>Vier-Gewinnt</h1>
+        <p id="currentPlayer" role="status"></p>
 
-            <tr>
-                <td id="field-0-5" class="field white" data-col="0"></td>
-                <td id="field-1-5" class="field white" data-col="1"></td>
-                <td id="field-2-5" class="field white" data-col="2"></td>
-                <td id="field-3-5" class="field white" data-col="3"></td>
-                <td id="field-4-5" class="field white" data-col="4"></td>
-                <td id="field-5-5" class="field white" data-col="5"></td>
-                <td id="field-6-5" class="field white" data-col="6"></td>
-            </tr>
-            <tr>
-                <td id="field-0-4" class="field white" data-col="0"></td>
-                <td id="field-1-4" class="field white" data-col="1"></td>
-                <td id="field-2-4" class="field white" data-col="2"></td>
-                <td id="field-3-4" class="field white" data-col="3"></td>
-                <td id="field-4-4" class="field white" data-col="4"></td>
-                <td id="field-5-4" class="field white" data-col="5"></td>
-                <td id="field-6-4" class="field white" data-col="6"></td>
-            </tr>
-            <tr>
-                <td id="field-0-3" class="field white" data-col="0"></td>
-                <td id="field-1-3" class="field white" data-col="1"></td>
-                <td id="field-2-3" class="field white" data-col="2"></td>
-                <td id="field-3-3" class="field white" data-col="3"></td>
-                <td id="field-4-3" class="field white" data-col="4"></td>
-                <td id="field-5-3" class="field white" data-col="5"></td>
-                <td id="field-6-3" class="field white" data-col="6"></td>
 
-            </tr>
-            <tr>
-                <td id="field-0-2" class="field white" data-col="0"></td>
-                <td id="field-1-2" class="field white" data-col="1"></td>
-                <td id="field-2-2" class="field white" data-col="2"></td>
-                <td id="field-3-2" class="field white" data-col="3"></td>
-                <td id="field-4-2" class="field white" data-col="4"></td>
-                <td id="field-5-2" class="field white" data-col="5"></td>
-                <td id="field-6-2" class="field white" data-col="6"></td>
-            </tr>
-            <tr>
-                <td id="field-0-1" class="field white" data-col="0"></td>
-                <td id="field-1-1" class="field white" data-col="1"></td>
-                <td id="field-2-1" class="field white" data-col="2"></td>
-                <td id="field-3-1" class="field white" data-col="3"></td>
-                <td id="field-4-1" class="field white" data-col="4"></td>
-                <td id="field-5-1" class="field white" data-col="5"></td>
-                <td id="field-6-1" class="field white" data-col="6"></td>
-            </tr>
-            <tr>
-                <td id="field-0-0" class="field white" data-col="0"></td>
-                <td id="field-1-0" class="field white" data-col="1"></td>
-                <td id="field-2-0" class="field white" data-col="2"></td>
-                <td id="field-3-0" class="field white" data-col="3"></td>
-                <td id="field-4-0" class="field white" data-col="4"></td>
-                <td id="field-5-0" class="field white" data-col="5"></td>
-                <td id="field-6-0" class="field white" data-col="6"></td>
 
-            </tr>
-          </tbody>
-        </table>
-          <div id="playerNameInputs">
+        <div id="playField">
+            <section id="gameButtons" aria-label="Spielsteuerung">
+
+                <button type="button" id="start" class="buttonX">Start</button>
+                <button type="button" id="reset" class="buttonX" hidden>Zurücksetzen</button>
+
+            </section>
+
+
+
+            <table class="inactive" aria-label="Spielfeld">
+                <thead>
+                <tr>
+                    <th id="drop-0" class="field drop" data-col="0" scope="col" aria-label="Spalte 1"></th>
+                    <th id="drop-1" class="field drop" data-col="1" scope="col" aria-label="Spalte 2"></th>
+                    <th id="drop-2" class="field drop" data-col="2" scope="col" aria-label="Spalte 3"></th>
+                    <th id="drop-3" class="field drop" data-col="3" scope="col" aria-label="Spalte 4"></th>
+                    <th id="drop-4" class="field drop" data-col="4" scope="col" aria-label="Spalte 5"></th>
+                    <th id="drop-5" class="field drop" data-col="5" scope="col" aria-label="Spalte 6"></th>
+                    <th id="drop-6" class="field drop" data-col="6" scope="col" aria-label="Spalte 7"></th>
+                </tr>
+                </thead>
+                <tbody id="pField">
+
+                <tr>
+                    <td id="field-0-5" class="field white" data-col="0"></td>
+                    <td id="field-1-5" class="field white" data-col="1"></td>
+                    <td id="field-2-5" class="field white" data-col="2"></td>
+                    <td id="field-3-5" class="field white" data-col="3"></td>
+                    <td id="field-4-5" class="field white" data-col="4"></td>
+                    <td id="field-5-5" class="field white" data-col="5"></td>
+                    <td id="field-6-5" class="field white" data-col="6"></td>
+                </tr>
+                <tr>
+                    <td id="field-0-4" class="field white" data-col="0"></td>
+                    <td id="field-1-4" class="field white" data-col="1"></td>
+                    <td id="field-2-4" class="field white" data-col="2"></td>
+                    <td id="field-3-4" class="field white" data-col="3"></td>
+                    <td id="field-4-4" class="field white" data-col="4"></td>
+                    <td id="field-5-4" class="field white" data-col="5"></td>
+                    <td id="field-6-4" class="field white" data-col="6"></td>
+                </tr>
+                <tr>
+                    <td id="field-0-3" class="field white" data-col="0"></td>
+                    <td id="field-1-3" class="field white" data-col="1"></td>
+                    <td id="field-2-3" class="field white" data-col="2"></td>
+                    <td id="field-3-3" class="field white" data-col="3"></td>
+                    <td id="field-4-3" class="field white" data-col="4"></td>
+                    <td id="field-5-3" class="field white" data-col="5"></td>
+                    <td id="field-6-3" class="field white" data-col="6"></td>
+                </tr>
+                <tr>
+                    <td id="field-0-2" class="field white" data-col="0"></td>
+                    <td id="field-1-2" class="field white" data-col="1"></td>
+                    <td id="field-2-2" class="field white" data-col="2"></td>
+                    <td id="field-3-2" class="field white" data-col="3"></td>
+                    <td id="field-4-2" class="field white" data-col="4"></td>
+                    <td id="field-5-2" class="field white" data-col="5"></td>
+                    <td id="field-6-2" class="field white" data-col="6"></td>
+                </tr>
+                <tr>
+                    <td id="field-0-1" class="field white" data-col="0"></td>
+                    <td id="field-1-1" class="field white" data-col="1"></td>
+                    <td id="field-2-1" class="field white" data-col="2"></td>
+                    <td id="field-3-1" class="field white" data-col="3"></td>
+                    <td id="field-4-1" class="field white" data-col="4"></td>
+                    <td id="field-5-1" class="field white" data-col="5"></td>
+                    <td id="field-6-1" class="field white" data-col="6"></td>
+                </tr>
+                <tr>
+                    <td id="field-0-0" class="field white" data-col="0"></td>
+                    <td id="field-1-0" class="field white" data-col="1"></td>
+                    <td id="field-2-0" class="field white" data-col="2"></td>
+                    <td id="field-3-0" class="field white" data-col="3"></td>
+                    <td id="field-4-0" class="field white" data-col="4"></td>
+                    <td id="field-5-0" class="field white" data-col="5"></td>
+                    <td id="field-6-0" class="field white" data-col="6"></td>
+                </tr>
+                </tbody>
+            </table>
+
+
+
+            <section id="playerNameInputs" aria-label="Spielernamen und Farben">
                 <div id="player1Name">
-
-                    <div>
-                        <label for="p1Input" class="pNumName">Name Spieler 1:</label>
-                        <label for="p1Color"></label>
-                    </div>
+                    <label for="p1Input" class="pNumName">Name Spieler 1:</label>
                     <div class="pInputRow">
                         <input type="text" id="p1Input" name="player1" placeholder="Spieler 1">
-                        <input type="color" id="p1Color" name="favcolorP1" value="#ff0000">
+                        <input type="color" id="p1Color" name="favcolorP1" value="#ff0000" aria-label="Farbe Spieler 1">
                     </div>
-
                 </div>
-                <div id="player2Name">
 
-                    <div>
-                        <label for="p2Input" class="pNumName">Name Spieler 2:</label>
-                        <label for="p2Color" ></label>
-                    </div>
+
+                <div id="player2Name">
+                    <label for="p2Input" class="pNumName">Name Spieler 2:</label>
                     <div class="pInputRow">
                         <input type="text" id="p2Input" name="player2" placeholder="Spieler 2">
-                        <input type="color" id="p2Color" name="favcolorP2" value="#ffff00">
+                        <input type="color" id="p2Color" name="favcolorP2" value="#ffff00" aria-label="Farbe Spieler 2">
                     </div>
-
                 </div>
-          </div>
-      </div>
-
-
+            </section>
+        </div>
+    </main>
     </body>
 </html>
